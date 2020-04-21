@@ -1,24 +1,23 @@
-podTemplate(name: 'super-pod', label: 'super-pod', containers: [
-containerTemplate(name: 'python', image: 'python:3.7-alpine'),
-containerTemplate(name: 'docker', image: 'docker:stable')],
-volumes: [
-    hostPathVolume(mountPath: '/var/run/docker.sock',
-    hostPath: '/var/run/docker.sock'),])
-
-node("super-pod") {
-    stage('Checkout') {
-        checkout scm
-    }
-    stage("Build Docker Image") {
-        container('python'){
-        sh '''docker build -t stmosher/python_rest_api:latest .'''
-    }}
-
-    stage("Push to DockerHub") {
-        container('docker'){
-        docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
-            sh '''docker build -t stmosher/python_rest_api:latest .'''
-            sh '''docker push stmosher/python_rest_api:latest'''
-        }}
+podTemplate(
+    label: 'kubernetes',
+    containers: [
+        containerTemplate(name: 'maven', image: 'maven:alpine', ttyEnabled: true, command: 'cat'),
+        containerTemplate(name: 'golang', image: 'golang:alpine', ttyEnabled: true, command: 'cat')
+    ]
+) {
+    node('kubernetes') {
+        container('maven') {
+            stage('build') {
+                sh 'mvn --version'
+            }
+            stage('unit-test') {
+                sh 'java -version'
+            }
+        }
+        container('golang') {
+            stage('deploy') {
+                sh 'go version'
+            }
+        }
     }
 }
