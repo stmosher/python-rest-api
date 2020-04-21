@@ -1,23 +1,22 @@
 podTemplate(
-    label: 'kubernetes',
-    containers: [
-        containerTemplate(name: 'maven', image: 'maven:alpine', ttyEnabled: true, command: 'cat'),
-        containerTemplate(name: 'golang', image: 'golang:alpine', ttyEnabled: true, command: 'cat')
-    ]
+  label: 'test123',
+  yaml: """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: kubectl
+    image: vfarcic/kubectl
+    command: ["cat"]
+    tty: true
+"""
 ) {
-    node('kubernetes') {
-        container('maven') {
-            stage('build') {
-                sh 'mvn --version'
-            }
-            stage('unit-test') {
-                sh 'java -version'
-            }
-        }
-        container('golang') {
-            stage('deploy') {
-                sh 'go version'
-            }
+  node(label) {
+    node("docker") {
+    stage("func-test") {
+        container("kubectl") {
+          sh """kubectl get pods"""
         }
     }
+  }
 }
