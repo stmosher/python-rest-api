@@ -1,4 +1,4 @@
-podTemplate(name: 'super-pod', label: 'build-pod', containers: [
+podTemplate(name: 'super-pod', label: 'super-pod', containers: [
 containerTemplate(name: 'python', image: 'python:3.7-alpine'),
 containerTemplate(name: 'docker', image: 'docker:stable')],
 volumes: [
